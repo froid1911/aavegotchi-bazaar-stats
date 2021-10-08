@@ -3,8 +3,9 @@ import { Line } from 'react-chartjs-2';
 const apollo = require("apollo-fetch");
 
 
-export default ({trades, volume}) => (
-  <>
+export default function Home ({trades, volume}) { 
+  
+  return <>
     <div className="chartwrapper">
       <Line
         data={trades}
@@ -20,7 +21,7 @@ export default ({trades, volume}) => (
       />
     </div>
   </>
-);
+};
 
 // This function gets called at build time
 export async function getStaticProps() {
