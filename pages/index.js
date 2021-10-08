@@ -1,25 +1,6 @@
-import { LinearScale } from 'chart.js';
-import Head from 'next/head'
-import Image from 'next/image'
 import React from 'react';
-import { Chart } from 'react-charts';
-import styles from '../styles/Home.module.css'
 import { Line } from 'react-chartjs-2';
 const apollo = require("apollo-fetch");
-
-
-
-
-// export default () => (
-//   <div>
-//     <h2>Line Example</h2>
-//     <Line
-//       data={data}
-//       width={400}
-//       height={400}
-//     />
-//   </div>
-// );
 
 
 export default ({trades, volume}) => (
@@ -63,11 +44,7 @@ export async function getStaticProps() {
   let result = await graph({query});
   let {stats} = result.data;
   stats = stats.reverse();
-  console.log(stats);
-  // console.log(stats);
-  // Call an external API endpoint to get posts
-  // By returning { props: { posts } }, the Blog component
-  // will receive `posts` as a prop at build time
+  
   return {
     props: {
       trades:  {
@@ -118,7 +95,7 @@ export async function getStaticProps() {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: stats.map(e => parseInt(e.totalVolume))
+            data: stats.map(e => parseInt(e.totalVolume.slice(0, -18)))
           }
         ]
       },
