@@ -38,16 +38,20 @@ export default function Home ({trades, volume}) {
     <h2>Staking</h2>
     <table>
       <tr>
-        <td>Circulating Frens:</td>
-        <td>{formatter.format(data.staking.circulatingFrens.slice(0, -18))}</td>
-      </tr>
-      <tr>
-        <td>Circulating Tickets:</td>
-        <td>{data.staking.circulatingTickets}</td>
-      </tr>
+        <td>Total unique staker:</td>
+        <td>{formatter.format(data.staking.totalUniqueStaker)}</td>
+      </tr>      
       <tr>
         <td>Total Minted Frens:</td>
         <td>{formatter.format(data.staking.totalMintedFrens.slice(0, -18))}</td>
+      </tr>
+      <tr>
+        <td>Total Burned Frens for Tickets:</td>
+        <td>{formatter.format(data.staking.totalBurnedFrensForTickets.slice(0, -18))}</td>
+      </tr>
+      <tr>
+        <td>Circulating Frens:</td>
+        <td>{formatter.format(data.staking.circulatingFrens.slice(0, -18))}</td>
       </tr>
       <tr>
         <td>Total Minted Tickets:</td>
@@ -58,13 +62,13 @@ export default function Home ({trades, volume}) {
         <td>{formatter.format(data.staking.totalBurnedTicketsForRaffles)}</td>
       </tr>
       <tr>
-        <td>Total Burned Frens for Tickets:</td>
-        <td>{formatter.format(data.staking.totalBurnedFrensForTickets.slice(0, -18))}</td>
+        <td>Circulating Tickets:</td>
+        <td>{formatter.format(data.staking.circulatingTickets)}</td>
       </tr>
     </table></div>}
     {data.pools && <div>
       <h2>Staking Pools</h2>
-      {data.pools.map((p,i) => <div key={i}><h3>{p.name}</h3>Rewards: {formatter.format(p.frenRate)} frens/day; {formatter.format(p.totalEntrants)} total entrants with {formatter.format(p.totalStaked)} total staked.</div>)}
+      {data.pools.map((p,i) => <div key={i}><h3>{p.name}</h3>Rewards: {formatter.format(p.frenRate)} frens/day; has {formatter.format(p.totalEntrants)} total entrants with {formatter.format(p.totalStaked.slice(0, -18))} tokens staked.</div>)}
     </div>}
   
         </>
