@@ -4,7 +4,7 @@ const graphBazaar = apollo.createApolloFetch({
 });
 
 const graphStaking = apollo.createApolloFetch({
-    uri: "https://api.thegraph.com/subgraphs/id/QmRMpzQbLdcLfMseHxJAc8XQDTAWYaM3YXwM7ivjR5obzR"
+    uri: "http://157.90.182.138:8000/subgraphs/name/cinnabarhorse/stakinggraph"
 });
 
 
@@ -21,6 +21,7 @@ let queryBazaar = `
 
 let queryStaking = `
 {stakingStats {
+    id
     circulatingFrens
     circulatingTickets
     totalMintedTickets
@@ -41,12 +42,12 @@ stakePools {
 
 
 export default async (url) => {
-    let trades = null, volume = null, staking = null, error = null, pools = [];
+    let frens= null, tickets = null, trades = null, volume = null, staking = null, error = null, pools = [];
     let results = await Promise.all([
         graphStaking({query: queryStaking}),
         graphBazaar({query: queryBazaar}),
     ])
-    staking = results[0].data.stakingStats[0]
+    staking = results[0].data.stakingStats
     pools = results[0].data.stakePools
     console.log(results);
     let bazaarStats = results[1].data.stats.reverse();
@@ -77,6 +78,145 @@ export default async (url) => {
         ]
     };
 
+    frens =  {
+        labels: results[0].data.stakingStats.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Frens',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: results[0].data.stakingStats.map(e => parseInt(e.circulatingFrens.slice(0, -18)))
+        },
+        {
+            label: 'Burned Frens',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: results[0].data.stakingStats.map(e => parseInt(e.totalBurnedFrensForTickets.slice(0, -18)))
+        },
+        {
+            label: 'Total Minted Frens',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: results[0].data.stakingStats.map(e => parseInt(e.totalMintedFrens.slice(0, -18)))
+        },
+        ]
+    };
+
+    tickets =  {
+        labels: results[0].data.stakingStats.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: results[0].data.stakingStats.map(e => parseInt(e.circulatingTickets))
+        },
+        {
+            label: 'Burned Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: results[0].data.stakingStats.map(e => parseInt(e.totalBurnedTicketsForRaffles))
+        },
+        {
+            label: 'Total Minted Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: results[0].data.stakingStats.map(e => parseInt(e.totalMintedTickets))
+        },
+        ]
+    };
+
+
     volume = {
         labels: bazaarStats.map(e => new Date(parseInt(e.timestamp) * 1000).toDateString()),
         datasets: [
@@ -103,5 +243,5 @@ export default async (url) => {
         }
         ]
     };
-    return {trades, volume, staking, pools}
+    return {trades, volume, staking, pools, frens, tickets}
 }

@@ -34,38 +34,24 @@ export default function Home ({trades, volume}) {
       height={100}
     />
   </div>}
-  {data.staking && <div>
-    <h2>Staking</h2>
-    <table>
-      <tr>
-        <td>Total unique staker:</td>
-        <td>{formatter.format(data.staking.totalUniqueStaker)}</td>
-      </tr>      
-      <tr>
-        <td>Total Minted Frens:</td>
-        <td>{formatter.format(data.staking.totalMintedFrens.slice(0, -18))}</td>
-      </tr>
-      <tr>
-        <td>Total Burned Frens for Tickets:</td>
-        <td>{formatter.format(data.staking.totalBurnedFrensForTickets.slice(0, -18))}</td>
-      </tr>
-      <tr>
-        <td>Circulating Frens:</td>
-        <td>{formatter.format(data.staking.circulatingFrens.slice(0, -18))}</td>
-      </tr>
-      <tr>
-        <td>Total Minted Tickets:</td>
-        <td>{formatter.format(data.staking.totalMintedTickets)}</td>
-      </tr>
-      <tr>
-        <td>Total Burned Tickets for Raffles:</td>
-        <td>{formatter.format(data.staking.totalBurnedTicketsForRaffles)}</td>
-      </tr>
-      <tr>
-        <td>Circulating Tickets:</td>
-        <td>{formatter.format(data.staking.circulatingTickets)}</td>
-      </tr>
-    </table></div>}
+  {data.frens && <div className="chartwrapper">
+  <h2>Frens</h2>
+    <Line
+      data={data.frens}
+      width={100}
+      height={100}
+    />
+  </div>}
+ 
+  {data.tickets && <div className="chartwrapper">
+  <h2>Tickets</h2>
+    <Line
+      data={data.tickets}
+      width={100}
+      height={100}
+    />
+  </div>}
+
     {data.pools && <div>
       <h2>Staking Pools</h2>
       {data.pools.map((p,i) => <div key={i}><h3>{p.name}</h3>Rewards: {formatter.format(p.frenRate)} frens/day; has {formatter.format(p.totalEntrants)} total entrants with {formatter.format(p.totalStaked.slice(0, -18))} tokens staked.</div>)}
