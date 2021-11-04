@@ -2,7 +2,7 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Line } from 'react-chartjs-2';
 import useSWR from 'swr'
-import fetcher from "../fetcher";
+import fetcher from "../../fetcher";
 
 
 
@@ -19,35 +19,23 @@ export default function Home ({trades, volume}) {
   let formatter = new Intl.NumberFormat('us-US')
 
   return <Row>
-  
-
-  {data.frens && <Col >
-  <div className="chartwrapper">
-  <h2>Frens</h2>
+  { error != null && <div className="error">{error.message}</div>}
+  {(data.trades || data.staking) && <h2>Bazaar</h2>}
+  {data.trades && <Col><div className="chartwrapper">
     <Line
-      data={data.frens}
+      data={data.trades}
       width={100}
       height={100}
     />
   </div>
   </Col>}
- 
-  {data.tickets && <Col><div className="chartwrapper">
-  <h2>Tickets</h2>
+  {data.volume && <Col><div className="chartwrapper">
     <Line
-      data={data.tickets}
+      data={data.volume}
       width={100}
       height={100}
     />
   </div></Col>}
-
-    {data.pools && <Col>
-    <div>
-      <h2>Staking Pools</h2>
-      {data.pools.map((p,i) => <div key={i}><h3>{p.name}</h3>Rewards: {formatter.format(p.frenRate)} frens/day; has {formatter.format(p.totalEntrants)} total entrants with {formatter.format(p.totalStaked.slice(0, -18))} tokens staked.</div>)}
-    </div>
-    </Col>}
-
         </Row>
   
 };

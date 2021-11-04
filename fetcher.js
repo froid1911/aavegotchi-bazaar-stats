@@ -4,13 +4,13 @@ const graphBazaar = apollo.createApolloFetch({
 });
 
 const graphStaking = apollo.createApolloFetch({
-    uri: "https://api.thegraph.com/subgraphs/name/froid1911/aavegotchi-staking"
+    uri: "http://157.90.182.138:8000/subgraphs/name/cinnabarhorse/stakinggraph"
 });
 
 
 let queryBazaar = `
 {
-    stats(orderBy:timestamp orderDirection: desc first: 100) {
+    stats(orderBy:timestamp orderDirection: desc) {
         id
         totalTrades
         totalVolume
@@ -51,6 +51,7 @@ export default async (url) => {
     pools = results[0].data.stakePools
     console.log(results);
     let bazaarStats = results[1].data.stats.reverse();
+
     trades =  {
         labels: bazaarStats.map(e => new Date(parseInt(e.timestamp) * 1000).toDateString()),
         datasets: [
