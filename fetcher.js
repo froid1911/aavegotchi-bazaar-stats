@@ -4,7 +4,7 @@ const graphBazaar = apollo.createApolloFetch({
 });
 
 const graphStaking = apollo.createApolloFetch({
-    uri: "http://157.90.182.138:8000/subgraphs/name/cinnabarhorse/stakinggraph"
+    uri: "https://api.thegraph.com/subgraphs/id/Qmdc2gVmG3KpuGd9RhswFD1s2RbrvXVbE3MZ9MTZZk8jJp"
 });
 
 
