@@ -21,7 +21,7 @@ export default function Home ({trades, volume}) {
   return <Row>
     <h2>Staking Pools</h2>
     {data.pools && 
-      data.pools.map((p,i) => <Col md={3}><Card key={i}><Card.Body><Card.Title>{p.name}</Card.Title>Rewards: {formatter.format(p.frenRate)} frens/day; has {formatter.format(p.totalEntrants)} total entrants with {formatter.format(p.totalStaked.slice(0, -18))} tokens staked.</Card.Body></Card></Col>)
+      data.pools.map((p,i) => <Col md={3} key={i}><Card key={i}><Card.Body><Card.Title>{p.name}</Card.Title>Rewards: {formatter.format(p.frenRate)} frens/day; has {formatter.format(p.totalEntrants)} total entrants with {formatter.format(p.totalStaked.slice(0, -18))} tokens staked.</Card.Body></Card></Col>)
     }
 
     <h2>Ticket &amp; Fren supply</h2>
