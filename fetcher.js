@@ -1,11 +1,16 @@
 const apollo = require("apollo-fetch");
 const graphBazaar = apollo.createApolloFetch({
-    uri: "https://api.thegraph.com/subgraphs/name/froid1911/aavegotchi-bazaar"
+    uri: "https://static.138.182.90.157.clients.your-server.de/subgraphs/name/froid1911/aavegotchi-bazaar"
 });
 
+// const graphStaking = apollo.createApolloFetch({
+//     uri: "https://api.thegraph.com/subgraphs/id/Qmdc2gVmG3KpuGd9RhswFD1s2RbrvXVbE3MZ9MTZZk8jJp"
+// });
+
 const graphStaking = apollo.createApolloFetch({
-    uri: "https://api.thegraph.com/subgraphs/id/Qmdc2gVmG3KpuGd9RhswFD1s2RbrvXVbE3MZ9MTZZk8jJp"
+    uri: "https://static.138.182.90.157.clients.your-server.de/subgraphs/name/froid1911/stakinggraph-fast"
 });
+
 
 
 let queryBazaar = `
@@ -20,7 +25,7 @@ let queryBazaar = `
 `
 
 let queryStaking = `
-{stakingStats {
+{stakingStats(first: 1000 orderBy: id orderDirection: desc) {
     id
     circulatingFrens
     circulatingTickets
@@ -29,6 +34,30 @@ let queryStaking = `
     totalUniqueStaker
     totalMintedFrens
     totalBurnedFrensForTickets
+    
+    circulatingMythicalTickets
+    circulatingGodlikeTickets
+    circulatingRareTickets
+    circulatingDropTickets
+    circulatingCommonTickets
+    circulatingUncommonTickets
+    circulatingLegendaryTickets
+    
+    totalBurnedMythicalTicketsForRaffles
+    totalBurnedGodlikeTicketsForRaffles
+    totalBurnedRareTicketsForRaffles
+    totalBurnedDropTicketsForRaffles
+    totalBurnedCommonTicketsForRaffles
+    totalBurnedUncommonTicketsForRaffles
+    totalBurnedLegendaryTicketsForRaffles
+    
+    totalMintedMythicalTickets
+    totalMintedGodlikeTickets
+    totalMintedRareTickets
+    totalMintedDropTickets
+    totalMintedCommonTickets
+    totalMintedUncommonTickets
+    totalMintedLegendaryTickets
 }
 
 stakePools {
@@ -42,12 +71,24 @@ stakePools {
 
 
 export default async (url) => {
-    let frens= null, tickets = null, trades = null, volume = null, staking = null, error = null, pools = [];
+    let frens= null, 
+        tickets = null, 
+        trades = null, 
+        volume = null, 
+        staking = null, 
+        error = null, 
+        pools = [], 
+        ticketsRare = null, 
+        ticketsMythical = null, 
+        ticketsDrop = null, 
+        ticketsGodlike = null, 
+        ticketsCommon = null,
+        ticketsUncommon = null;
     let results = await Promise.all([
         graphStaking({query: queryStaking}),
         graphBazaar({query: queryBazaar}),
     ])
-    staking = results[0].data.stakingStats
+    staking = results[0].data.stakingStats.reverse();
     pools = results[0].data.stakePools
     console.log(results);
     let bazaarStats = results[1].data.stats.reverse();
@@ -80,7 +121,7 @@ export default async (url) => {
     };
 
     frens =  {
-        labels: results[0].data.stakingStats.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
         datasets: [
         {
             label: 'Circulating Frens',
@@ -101,7 +142,7 @@ export default async (url) => {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: results[0].data.stakingStats.map(e => parseInt(e.circulatingFrens.slice(0, -18)))
+            data: staking.map(e => parseInt(e.circulatingFrens.slice(0, -18)))
         },
         {
             label: 'Burned Frens',
@@ -122,7 +163,7 @@ export default async (url) => {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: results[0].data.stakingStats.map(e => parseInt(e.totalBurnedFrensForTickets.slice(0, -18)))
+            data: staking.map(e => parseInt(e.totalBurnedFrensForTickets.slice(0, -18)))
         },
         {
             label: 'Total Minted Frens',
@@ -143,13 +184,13 @@ export default async (url) => {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: results[0].data.stakingStats.map(e => parseInt(e.totalMintedFrens.slice(0, -18)))
+            data: staking.map(e => parseInt(e.totalMintedFrens.slice(0, -18)))
         },
         ]
     };
 
     tickets =  {
-        labels: results[0].data.stakingStats.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
         datasets: [
         {
             label: 'Circulating Tickets',
@@ -170,7 +211,7 @@ export default async (url) => {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: results[0].data.stakingStats.map(e => parseInt(e.circulatingTickets))
+            data: staking.map(e => parseInt(e.circulatingTickets))
         },
         {
             label: 'Burned Tickets',
@@ -191,7 +232,7 @@ export default async (url) => {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: results[0].data.stakingStats.map(e => parseInt(e.totalBurnedTicketsForRaffles))
+            data: staking.map(e => parseInt(e.totalBurnedTicketsForRaffles))
         },
         {
             label: 'Total Minted Tickets',
@@ -212,10 +253,417 @@ export default async (url) => {
             pointHoverBorderWidth: 2,
             pointRadius: 1,
             pointHitRadius: 10,
-            data: results[0].data.stakingStats.map(e => parseInt(e.totalMintedTickets))
+            data: staking.map(e => parseInt(e.totalMintedTickets))
+        }
+    ]};
+
+    ticketsDrop =  {
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Drop Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.circulatingDropTickets))
         },
-        ]
-    };
+        {
+            label: 'Burned Drop Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalBurnedDropTicketsForRaffles))
+        },
+        {
+            label: 'Total Minted Drop Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalMintedDropTickets))
+        }
+    ]};
+
+    ticketsGodlike =  {
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Godlike Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.circulatingGodlikeTickets))
+        },
+        {
+            label: 'Burned Godlike Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalBurnedGodlikeTicketsForRaffles))
+        },
+        {
+            label: 'Total Minted Godlike Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalMintedGodlikeTickets))
+        }
+    ]};
+
+    ticketsMythical =  {
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Mythical Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.circulatingMythicalTickets))
+        },
+        {
+            label: 'Burned Mythical Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalBurnedMythicalTicketsForRaffles))
+        },
+        {
+            label: 'Total Minted Mythical Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalMintedMythicalTickets))
+        }
+    ]};
+
+    ticketsRare =  {
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Rare Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.circulatingRareTickets))
+        },
+        {
+            label: 'Burned Rare Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalBurnedRareTicketsForRaffles))
+        },
+        {
+            label: 'Total Minted Rare Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalMintedRareTickets))
+        }
+    ]};
+
+    ticketsUncommon =  {
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Uncommon Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.circulatingUncommonTickets))
+        },
+        {
+            label: 'Burned Uncommon Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalBurnedUncommonTicketsForRaffles))
+        },
+        {
+            label: 'Total Minted Uncommon Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalMintedUncommonTickets))
+        }
+    ]};
+
+    ticketsCommon =  {
+        labels: staking.map(e => new Date(parseInt(e.id.split("-")[1]) * 1000).toDateString()),
+        datasets: [
+        {
+            label: 'Circulating Common Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,75,0.4)',
+            borderColor: 'rgba(75,192,75,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,75,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,75,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.circulatingCommonTickets))
+        },
+        {
+            label: 'Burned Common Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(192,75,192,0.4)',
+            borderColor: 'rgba(192,75,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(192,75,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(192,75,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalBurnedCommonTicketsForRaffles))
+        },
+        {
+            label: 'Total Minted Common Tickets',
+            fill: false,
+            lineTension: 0.1,
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: 'rgba(75,192,192,1)',
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+            pointHoverBorderColor: 'rgba(220,220,220,1)',
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data: staking.map(e => parseInt(e.totalMintedCommonTickets))
+        }
+    ]};
 
 
     volume = {
@@ -244,5 +692,5 @@ export default async (url) => {
         }
         ]
     };
-    return {trades, volume, staking, pools, frens, tickets}
+    return {trades, volume, staking, pools, frens, tickets, ticketsRare, ticketsGodlike, ticketsMythical, ticketsDrop, ticketsCommon, ticketsUncommon}
 }

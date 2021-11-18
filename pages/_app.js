@@ -4,9 +4,8 @@ import '../styles/globals.css'
 
 function MyApp({ Component, pageProps }) {
   return <div>
-            <Navbar bg="dark" expand="lg">
+            <Navbar expand="lg">
   <Container>
-    <Navbar.Brand href="#home">Aavegotchi Stats</Navbar.Brand>
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav className="me-auto">

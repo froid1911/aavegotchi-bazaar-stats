@@ -72,6 +72,7 @@ a {
 }
 
 .searchBtn {
+  color: #f2f2f2;
   padding: 0px;
   display: flex;
   -webkit-box-align: center;
@@ -112,4 +113,14 @@ input:-internal-autofill-selected {
 .chartwrapper {
   width: 600px;
   height: 650px;
+}
+
+.navbar,
+.card {
+  background-color: #200449 !important;
+  color: #f2f2f2;
+}
+
+.navbar a {
+  color: #f2f2f2 !important;
 }
