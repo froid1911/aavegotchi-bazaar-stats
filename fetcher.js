@@ -13,7 +13,7 @@ const graphStaking = apollo.createApolloFetch({
 
 let queryBazaar = `
 {
-    stats(orderBy:timestamp orderDirection: desc) {
+    stats(first: 1000 orderBy:timestamp orderDirection: desc) {
         id
         totalTrades
         totalVolume
